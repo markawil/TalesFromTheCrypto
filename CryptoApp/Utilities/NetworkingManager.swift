@@ -50,4 +50,14 @@ class NetworkingManager {
             print("Error: \(error.localizedDescription)")
         }
     }
+    
+    static func apiKey() -> String? {
+        guard let bundlePath = Bundle.main.path(forResource: "Keys", ofType: "plist"),
+              let dict = NSDictionary(contentsOfFile: bundlePath) as? [String: AnyObject],
+              let apiKey = dict["API_KEY"] as? String else {
+            return nil
+        }
+        
+        return apiKey
+    }
 }
