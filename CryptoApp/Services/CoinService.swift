@@ -1,0 +1,45 @@
+//
+//  CoinService.swift
+//  CryptoApp
+//
+//  Created by Mark Wilkinson on 2/23/25.
+//
+
+import Foundation
+
+class CoinService {
+    
+    @Published var allCoins: [Coin] = []
+    
+    init() {
+        loadCoins()
+    }
+    
+    private func loadCoins() {
+        guard let url = URL(string: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false") else {
+            fatalError("Invalid URL")
+        }
+        
+        _ = URLSession.shared.dataTaskPublisher(for: url)
+            .subscribe(on: DispatchQueue.global(qos: .default))
+            .tryMap { (output) -> Data in
+                guard let response = output.response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
+                    throw URLError(.badServerResponse)
+                }
+                
+                return output.data
+            }
+            .receive(on: DispatchQueue.main)
+            .decode(type: [Coin].self, decoder: JSONDecoder())
+            .sink(receiveCompletion: { (completion) in
+                switch completion {
+                case .finished:
+                    print("Finished")
+                case .failure(let error):
+                    print("Error: \(error.localizedDescription)")
+                }
+            }, receiveValue: { [weak self] (coins) in
+                self?.allCoins = coins
+            })
+    }
+}
