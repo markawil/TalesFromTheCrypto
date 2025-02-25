@@ -9,7 +9,9 @@ import SwiftUI
 
 struct PortfolioView: View {
     
+    @Environment(\.presentationMode) private var mode
     @EnvironmentObject private var vm: HomeViewModel
+    
     @State private var selectedCoin: Coin?
     @State private var quantity: String = ""
     @State private var showCheckmark = false
@@ -28,17 +30,22 @@ struct PortfolioView: View {
             .navigationTitle("Edit Portfolio")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    XMarkButton()
+                    Button {
+                        mode.wrappedValue.dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.headline)
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     saveButtonToolBarItem
                 }
             }
-            .onChange(of: vm.searchText) { newValue in
-                if newValue.isEmpty {
+            .onChange(of: vm.searchText, {
+                if vm.searchText.isEmpty {
                     removeSelectedCoin()
                 }
-            }
+            })
         }
     }
 }
@@ -61,7 +68,7 @@ extension PortfolioView {
                         .padding(4)
                         .onTapGesture {
                             withAnimation {
-                                selectedCoin = coin
+                                updateSelectedCoin(coin: coin)
                             }
                         }
                         .background {
@@ -73,6 +80,16 @@ extension PortfolioView {
             .padding(.vertical, 4)
             .padding(.leading)
         }
+    }
+    
+    private func updateSelectedCoin(coin: Coin) {
+        selectedCoin = coin
+        
+        if let portfolioCoin = vm.portfolioCoins.first(where: { $0.id == coin.id }), let amount = portfolioCoin.currentHoldings {
+            quantity = String(amount)
+        } else {
+            quantity = ""
+        }        
     }
     
     private func getCurrentValue() -> Double {
@@ -127,9 +144,11 @@ extension PortfolioView {
     }
     
     private func saveButtonPressed() {
-        guard let coin = selectedCoin else { return }
+        guard let coin = selectedCoin,
+              let amount = Double(quantity) else { return }
         
         // Save to the portfolio
+        vm.updatePortfolio(coin: coin, amount: amount)
         
         // show checkmark
         withAnimation(.easeIn) {

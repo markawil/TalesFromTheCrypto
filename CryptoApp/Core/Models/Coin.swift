@@ -123,7 +123,7 @@ struct Coin: Identifiable, Codable {
                     lastUpdated: lastUpdated,
                     sparklineIn7D: sparklineIn7D,
                     priceChangePercentage24HInCurrency: priceChangePercentage24HInCurrency,
-                    currentHoldings: currentHoldings)
+                    currentHoldings: amount)
     }
     
     var currentHoldingsValue: Double {
