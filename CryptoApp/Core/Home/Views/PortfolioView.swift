@@ -34,6 +34,11 @@ struct PortfolioView: View {
                     saveButtonToolBarItem
                 }
             }
+            .onChange(of: vm.searchText) { newValue in
+                if newValue.isEmpty {
+                    removeSelectedCoin()
+                }
+            }
         }
     }
 }
@@ -111,7 +116,7 @@ extension PortfolioView {
             Image(systemName: "checkmark")
                 .opacity(showCheckmark ? 1 : 0)
             Button {
-                
+                saveButtonPressed()
             } label: {
                 Text("Save".uppercased())
             }
@@ -129,6 +134,7 @@ extension PortfolioView {
         // show checkmark
         withAnimation(.easeIn) {
             showCheckmark = true
+            removeSelectedCoin()
         }
         
         // hide keyboard
