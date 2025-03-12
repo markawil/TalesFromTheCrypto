@@ -12,6 +12,8 @@ struct HomeView: View {
     @EnvironmentObject private var vm: HomeViewModel
     @State private var showPortfolio: Bool = false // navigate to the right
     @State private var showPortfolioView: Bool = false // popup a sheet view
+    @State private var showDetailView: Bool = false
+    @State private var selectedCoin: Coin?
     
     var body: some View {
         ZStack {
@@ -29,13 +31,23 @@ struct HomeView: View {
                 SearchBarView(searchText: $vm.searchText)
                 columnTitles
                 Spacer()
-                if !showPortfolio {
-                    allCoinsList
-                        .transition(.move(edge: .leading))
-                } else {
-                    portfolioCoinsList
-                        .transition(.move(edge: .trailing))
+                VStack {
+                    if !showPortfolio {
+                        allCoinsList
+                            .transition(.move(edge: .leading))
+                    } else {
+                        portfolioCoinsList
+                            .transition(.move(edge: .trailing))
+                    }
                 }
+                .navigationDestination(isPresented: $showDetailView) {
+                    if let _ = selectedCoin {
+                        DetailLoadingView(coin: $selectedCoin)
+                    }
+                }
+            }
+            .refreshable {
+                vm.reloadData()
             }
         }
     }
@@ -90,6 +102,10 @@ extension HomeView {
             ForEach(vm.coins) { coin in
                 CoinRowView(coin: coin, showHoldingsColumn: false)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                    .onTapGesture {
+                        selectedCoin = coin
+                        showDetailView.toggle()
+                    }
             }
         }
         .listStyle(PlainListStyle())
@@ -100,6 +116,10 @@ extension HomeView {
             ForEach(vm.portfolioCoins) { coin in
                 CoinRowView(coin: coin, showHoldingsColumn: true)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                    .onTapGesture {
+                        selectedCoin = coin
+                        showDetailView.toggle()
+                    }
             }
         }
         .listStyle(PlainListStyle())
@@ -107,13 +127,43 @@ extension HomeView {
     
     private var columnTitles: some View {
         HStack {
-            Text("Coin")
+            HStack(spacing: 4) {
+                Text("Coin")
+                Image(systemName: "chevron.down")
+                    .opacity((vm.currentSortOption == .rank || vm.currentSortOption == .rankReversed) ? 1.0 : 0.0)
+                    .rotationEffect(Angle(degrees: vm.currentSortOption == .rank ? 0 : 180))
+            }
+            .onTapGesture {
+                withAnimation(.default) {
+                    vm.currentSortOption = vm.currentSortOption == .rank ? .rankReversed : .rank
+                }
+            }
             Spacer()
             if showPortfolio {
-                Text("Holdings")
+                HStack(spacing: 4) {
+                    Text("Holdings")
+                    Image(systemName: "chevron.down")
+                        .opacity((vm.currentSortOption == .holdings || vm.currentSortOption == .holdingsReversed) ? 1.0 : 0.0)
+                        .rotationEffect(Angle(degrees: vm.currentSortOption == .holdings ? 0 : 180))
+                }
+                .onTapGesture {
+                    withAnimation(.default) {
+                        vm.currentSortOption = vm.currentSortOption == .holdings ? .holdingsReversed : .holdings
+                    }
+                }
             }
-            Text("Price")
-                .frame(width: UIScreen.main.bounds.width / 3.5, alignment: .trailing)
+            HStack(spacing: 4) {
+                Text("Price")
+                Image(systemName: "chevron.down")
+                    .opacity((vm.currentSortOption == .price || vm.currentSortOption == .priceReversed) ? 1.0 : 0.0)
+                    .rotationEffect(Angle(degrees: vm.currentSortOption == .price ? 0 : 180))
+            }
+            .frame(width: UIScreen.main.bounds.width / 3.5, alignment: .trailing)
+            .onTapGesture {
+                withAnimation(.default) {
+                    vm.currentSortOption = vm.currentSortOption == .price ? .priceReversed : .price
+                }
+            }
         }
         .font(.caption)
         .fontWeight(.semibold)

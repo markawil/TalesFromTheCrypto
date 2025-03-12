@@ -20,7 +20,7 @@ class MarketDataService {
         loadData()
     }
     
-    private func loadData() {
+    func loadData() {
         
         guard let url = URL(string: marketDataPath) else {
             fatalError("Invalid URL")

@@ -49,6 +49,15 @@ import Foundation
    }
  */
 
+enum CoinSortOptions {
+    case rank
+    case rankReversed
+    case holdings
+    case holdingsReversed
+    case price
+    case priceReversed
+}
+
 struct Coin: Identifiable, Codable {
     
     let id, symbol, name: String

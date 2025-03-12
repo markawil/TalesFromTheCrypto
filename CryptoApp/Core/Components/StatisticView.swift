@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StatisticView: View {
     
-    let statistic: Statistic
+    let statistic: Statistics
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {

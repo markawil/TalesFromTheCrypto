@@ -12,7 +12,7 @@ let apiKey_key = "x-cg-demo-api-key"
 
 class CoinService {
     
-    private let coingeckoPath = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false"
+    private let coinsPath = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=true"
     
     @Published var allCoins: [Coin] = []
     
@@ -22,9 +22,9 @@ class CoinService {
         loadCoins()
     }
     
-    private func loadCoins() {
+    func loadCoins() {
         
-        guard let url = URL(string: coingeckoPath) else {
+        guard let url = URL(string: coinsPath) else {
             fatalError("Invalid URL")
         }
         guard let apiKey = NetworkingManager.apiKey() else {
