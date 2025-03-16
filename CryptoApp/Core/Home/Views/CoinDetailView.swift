@@ -35,13 +35,18 @@ struct CoinDetailView: View {
             VStack(spacing: 20) {
                 ChartView(coin: detailsVM.coin)
                 overviewTitle
+                    .padding(.leading)
                 Divider()
                 overviewGrid
+                    .padding(.leading)
                 additionalTitle
+                    .padding(.leading)
                 Divider()
                 additionalGrid
+                    .padding(.leading)
             }
             .padding()
+            
         }
         .navigationTitle(detailsVM.coin.name)
         .navigationBarTitleDisplayMode(.large)

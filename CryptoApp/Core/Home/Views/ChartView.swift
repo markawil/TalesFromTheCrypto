@@ -48,6 +48,16 @@ struct ChartView: View {
         .chartYAxis {
             AxisMarks(position: .leading)
         }
+        .chartXAxis {
+            AxisMarks(preset: .aligned, values: .stride(by: Float(viewModel.xAxisStrideCount+1))) { value in
+                let num = value.as(Int.self)!
+                let day = viewModel.dateForXAxisValue(num)
+                AxisGridLine()
+                AxisValueLabel() {
+                    Text("\(day)")
+                }
+            }
+        }
         .padding()
         .frame(width: UIScreen.main.bounds.width, height: 200)
     }
@@ -58,3 +68,5 @@ struct ChartView_preview: PreviewProvider {
         ChartView(coin: dev.coin)
     }
 }
+
+    
