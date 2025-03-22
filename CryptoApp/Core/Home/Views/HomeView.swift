@@ -9,9 +9,11 @@ import SwiftUI
 
 struct HomeView: View {
     
+    @Environment(\.presentationMode) private var mode
     @EnvironmentObject private var vm: HomeViewModel
     @State private var showPortfolio: Bool = false // navigate to the right
-    @State private var showPortfolioView: Bool = false // popup a sheet view
+    @State private var showPortfolioView: Bool = false // popup portfolio sheet view
+    @State private var showSettingsView: Bool = false // popup settings sheet view
     @State private var showDetailView: Bool = false
     @State private var selectedCoin: Coin?
     
@@ -46,6 +48,9 @@ struct HomeView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showSettingsView) {
+                SettingsView()
+            }
             .refreshable {
                 vm.reloadData()
             }
@@ -74,6 +79,8 @@ extension HomeView {
                 .onTapGesture {
                     if showPortfolio { // if we're on the portfolio screen
                         showPortfolioView.toggle()
+                    } else {
+                        showSettingsView.toggle()
                     }
                 }
                 .background {

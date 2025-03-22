@@ -19,6 +19,13 @@ class CoinDetails: Identifiable, Codable {
         case blockTimeInMinutes = "block_time_in_minutes"
         case hashingAlgorithm = "hashing_algorithm"
     }
+    
+    var readableDescription: String {
+        guard let description = description?.en else {
+            return "No description available"
+        }
+        return description.removingHTMLOccurrences
+    }
 }
 
 // MARK: - Description

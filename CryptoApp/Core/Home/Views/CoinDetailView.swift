@@ -24,6 +24,8 @@ struct CoinDetailView: View {
     
     @StateObject var detailsVM: CoinDetailViewModel
     
+    @State private var showFullDescription = false
+    
     private let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
     init(coin: Coin) {
@@ -32,18 +34,20 @@ struct CoinDetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack {
                 ChartView(coin: detailsVM.coin)
-                overviewTitle
-                    .padding(.leading)
-                Divider()
-                overviewGrid
-                    .padding(.leading)
-                additionalTitle
-                    .padding(.leading)
-                Divider()
-                additionalGrid
-                    .padding(.leading)
+                VStack(spacing: 20) {
+                    overviewTitle
+                    Divider()
+                    descriptionSection
+                    overviewGrid
+                    additionalTitle
+                    Divider()
+                    additionalGrid
+                    Divider()
+                    websiteLinks
+                }
+                .padding(.horizontal)
             }
             .padding()
             
@@ -94,6 +98,31 @@ extension CoinDetailView {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
     
+    private var descriptionSection: some View {
+        ZStack {
+            VStack(alignment: .leading) {
+                if let coinDescription = detailsVM.coinDescription,
+                   coinDescription.isEmpty == false {
+                    Text(coinDescription)
+                        .lineLimit(showFullDescription ? nil : 3)
+                        .font(.callout)
+                        .foregroundStyle(Color.theme.secondarText)
+                }
+                Button {
+                    withAnimation(.easeInOut) {
+                        showFullDescription.toggle()
+                    }
+                } label: {
+                    Text(showFullDescription ? "Show less..." : "Read more...")
+                        .font(.caption)
+                        .bold()
+                        .padding(.vertical, 4)
+                }
+                .accentColor(.blue)
+            }
+        }
+    }
+    
     private var overviewGrid: some View {
         LazyVGrid(columns: columns,
                   alignment: .leading,
@@ -112,5 +141,19 @@ extension CoinDetailView {
                 StatisticView(statistic: stat)
             }
         }
+    }
+    
+    private var websiteLinks: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            if let websiteURL = detailsVM.websiteURL {
+                Link("Website", destination: websiteURL)
+            }
+            if let redditURL = detailsVM.redditURL {
+                Link("Reddit", destination: redditURL)
+            }
+        }
+        .accentColor(.blue)
+        .frame(maxWidth: UIScreen.main.bounds.width, alignment: .leading)
+        .font(.headline)
     }
 }
