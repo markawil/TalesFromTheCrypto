@@ -29,6 +29,7 @@ class GithubUserService {
                 
         userSubscription = NetworkingManager.download(for: request)
             .decode(type: GithubUser.self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { (completion) in
                 NetworkingManager.handle(completion: completion)
             }, receiveValue: { [weak self] user in

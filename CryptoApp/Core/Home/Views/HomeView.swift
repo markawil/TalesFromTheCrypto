@@ -32,20 +32,33 @@ struct HomeView: View {
                 HomeStatsView(showPortfolio: $showPortfolio)
                 SearchBarView(searchText: $vm.searchText)
                 columnTitles
-                Spacer()
-                VStack {
-                    if !showPortfolio {
-                        allCoinsList
-                            .transition(.move(edge: .leading))
-                    } else {
-                        portfolioCoinsList
-                            .transition(.move(edge: .trailing))
+                
+                if !showPortfolio {
+                    allCoinsList
+                        .transition(.move(edge: .leading))
+                } else {
+                    ZStack(alignment: .top) {
+                        if vm.portfolioCoins.isEmpty && vm.searchText.isEmpty {
+                            Text("Add Coins to your Portfolio.")
+                                .font(.callout)
+                                .foregroundStyle(Color.theme.accent)
+                                .fontWeight(.medium)
+                                .multilineTextAlignment(.center)
+                                .padding(50)
+                        } else {
+                            portfolioCoinsList
+                        }
                     }
+                    .transition(.move(edge: .trailing))
+                    
                 }
-                .navigationDestination(isPresented: $showDetailView) {
-                    if let _ = selectedCoin {
-                        DetailLoadingView(coin: $selectedCoin)
-                    }
+                
+                Spacer(minLength: 0)
+                
+            }
+            .navigationDestination(isPresented: $showDetailView) {
+                if let _ = selectedCoin {
+                    DetailLoadingView(coin: $selectedCoin)
                 }
             }
             .sheet(isPresented: $showSettingsView) {
@@ -113,6 +126,7 @@ extension HomeView {
                         selectedCoin = coin
                         showDetailView.toggle()
                     }
+                    .listRowBackground(Color.theme.background)
             }
         }
         .listStyle(PlainListStyle())
@@ -127,9 +141,11 @@ extension HomeView {
                         selectedCoin = coin
                         showDetailView.toggle()
                     }
+                    .listRowBackground(Color.theme.background)
             }
         }
         .listStyle(PlainListStyle())
+        
     }
     
     private var columnTitles: some View {
